@@ -1,0 +1,181 @@
+import java.lang.reflect.*;
+
+class cParams
+{
+  float ringRad = 200.0;  
+  float ballRad = 5.0;  
+  int numCells = 5;  
+  int numRepeats = 9;
+  float scale = 0.79;
+  float reinforcementDepth = 50.0; // 0.5*sqrt(3.0)*ringRad*2.0*PI/(3.0*numCells);
+  float quadric = 0.5;
+}
+cLattice latticeMaker(cParams params)
+{  
+  float r = 10;
+  int a = 50;
+  int b = a*2;
+  float c = 0;
+  
+
+  // create lattice object
+  cLattice structure = new cLattice();
+  
+  // design the ball cloud 
+  cBallCloud bC = new cBallCloud();
+  int n = 3; // number of balls in a cell  
+//0-3
+  bC.addBall(a,0,b,r); 
+  bC.addBall(0,a,b,r); 
+  bC.addBall(-a,0,b,r); 
+  bC.addBall(0,-a,b,r); 
+
+//4-7
+  bC.addBall(a,0,-b,r); 
+  bC.addBall(0,a,-b,r); 
+  bC.addBall(-a,0,-b,r); 
+  bC.addBall(0,-a,-b,r); 
+  
+//8-11  
+  bC.addBall(a,b,0,r); 
+  bC.addBall(0,b,a,r); 
+  bC.addBall(-a,b,0,r); 
+  bC.addBall(0,b,-a,r); 
+  
+//12-15  
+  bC.addBall(a,-b,0,r); 
+  bC.addBall(0,-b,a,r); 
+  bC.addBall(-a,-b,0,r); 
+  bC.addBall(0,-b,-a,r); 
+  
+//16-19  
+  bC.addBall(b,a,0,r); 
+  bC.addBall(b,0,a,r); 
+  bC.addBall(b,-a,0,r); 
+  bC.addBall(b,0,-a,r); 
+  
+//20-23
+  bC.addBall(-b,a,0,r); 
+  bC.addBall(-b,0,a,r); 
+  bC.addBall(-b,-a,0,r); 
+  bC.addBall(-b,0,-a,r); 
+  
+  //bC.addBall(a,b,0,r);
+  //bC.addBall(a,-b,0,r); 
+  //bC.addBall(-a,b,0,r); 
+  //bC.addBall(-a,-b,0,r);
+  
+  
+  //bC.addBall(a,0,b,r); 
+  //bC.addBall(a,0,-b,r); 
+  //bC.addBall(-a,0,b,r); 
+  //bC.addBall(-a,0,-b,r); 
+
+  //bC.addBall(b,0,a,r); 
+  //bC.addBall(b,0,-a,r); 
+  //bC.addBall(-b,0,a,r); 
+  //bC.addBall(-b,0,-a,r); 
+  
+  // bC.addBall(b,a,0,r); 
+  //bC.addBall(b,-a,0,r); 
+  //bC.addBall(-b,a,0,r); 
+  //bC.addBall(-b,-a,0,r); 
+  
+  //bC.addBall(0,b,a,r); 
+  //bC.addBall(0,-b,a,r); 
+  //bC.addBall(0,b,-a,r); 
+  //bC.addBall(0,-b,-a,r); 
+  
+  //bC.addBall(0,a,b,r); 
+  //bC.addBall(0,a,-b,r); 
+  //bC.addBall(0,-a,b,r); 
+  //bC.addBall(0,-a,-b,r); 
+  // set ball color
+  for(int i=0; i<bC.numBalls(); i++){bC.setBallColor(i,bronze);}
+  
+  // add ball cloud
+  structure.addBallCloud(bC);
+  
+//0-3
+  structure.addIntraBeam(1,0);
+  structure.addIntraBeam(2,1);
+  structure.addIntraBeam(2,3);
+  structure.addIntraBeam(3,0);
+  
+//4-7
+  structure.addIntraBeam(4,5);
+  structure.addIntraBeam(6,5);
+  structure.addIntraBeam(6,7);
+  structure.addIntraBeam(7,4);
+
+//8-11
+  structure.addIntraBeam(8,9);
+  structure.addIntraBeam(9,10);
+  structure.addIntraBeam(10,11);
+  structure.addIntraBeam(11,8);
+
+//12-15
+  structure.addIntraBeam(12,13);
+  structure.addIntraBeam(13,14);
+  structure.addIntraBeam(14,15);
+  structure.addIntraBeam(15,12);
+  
+//16-19
+  structure.addIntraBeam(16,17);
+  structure.addIntraBeam(17,18);
+  structure.addIntraBeam(18,19);
+  structure.addIntraBeam(19,16);
+
+//20-23
+  structure.addIntraBeam(20,21);
+  structure.addIntraBeam(21,22);
+  structure.addIntraBeam(22,23);
+  structure.addIntraBeam(23,20);
+  
+  structure.addIntraBeam(1,9);
+  structure.addIntraBeam(5,11);
+  structure.addIntraBeam(13,3);
+  structure.addIntraBeam(15,7);
+  structure.addIntraBeam(17,0);
+  structure.addIntraBeam(19,4);
+  structure.addIntraBeam(21,2);
+  structure.addIntraBeam(23,6);
+  structure.addIntraBeam(8,16);
+  structure.addIntraBeam(18,12);
+  structure.addIntraBeam(22,14);
+  structure.addIntraBeam(20,10);
+  
+for(int i=0; i<bC.numBalls(); i++){structure.addInterBeam(i,i,0,0,1);}
+  
+  // set beam color
+  for(int i=0; i<structure.numBeamsInCloud(); i++){structure.setBeamColor(i,contrastingColors[gC++%21]);}
+  
+  // define transforms
+  cTransform s1 = new cTransform(), s2 = new cTransform(), s3 = new cTransform();
+  int n1=1, n2=1, n3=1;
+  
+  s1.translate(2*a,0,0);
+  //s1.scale(.79);
+  s1.rotate(PI/50, V(0,0,1.0));
+  
+  
+  s2.translate(0,b,0);
+  //s1.scale(.79);
+  //s2.rotate(PI/2, V(0,0,1.0));
+  
+  
+  //s3.translate(0,0,y*2);
+  s3.scale(1.02);
+  //s3.rotate(0.2*alpha, V(1,1,1));
+  
+  //looped directions
+  //structure.closeDirection1();
+  //structure.closeDirection2();
+  //structure.closeDirection3();
+  
+  // applyTransform
+  structure.addTransforms(s1,s2,s3,n1,n2,n3);
+  
+  // return the structure
+  return structure;
+}

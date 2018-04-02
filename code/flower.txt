@@ -1,0 +1,143 @@
+import java.lang.reflect.*;
+
+class cParams
+{
+  float ringRad = 200.0;  
+  float ballRad = 5.0;  
+  int numCells = 5;  
+  int numRepeats = 9;
+  float scale = 0.79;
+  float reinforcementDepth = 50.0; // 0.5*sqrt(3.0)*ringRad*2.0*PI/(3.0*numCells);
+  float quadric = 0.5;
+}
+cLattice latticeMaker(cParams params)
+{  
+  float r = 10;
+  float a = 80*2;
+  float b = tan(PI/3)*a;
+  float c = b*sin(radians(135))/sin(radians(15));
+  float d = c-a;
+  float e = b*sin(radians(30))/sin(radians(15));
+  float ratio = 0.75;
+  float xx = ratio*d;
+  float yy = ratio*e;
+  float y = e-yy;
+  float x = a+d-xx;
+  float f = ratio*a;
+  f = y;
+  float g = b+y*sin(PI/4);
+  float h = y*sin(PI/4);
+  float i = f/2.0+h;
+  float j = h-f*sin(PI/3)+b;
+  float k = x*sin(PI/3);
+  float l = x/2.0;
+
+
+
+  // create lattice object
+  cLattice structure = new cLattice();
+  
+  // design the ball cloud 
+  cBallCloud bC = new cBallCloud();
+  int n = 3; // number of balls in a cell  
+  bC.addBall(0,0,0,r); 
+  bC.addBall(0,b,0,r); 
+  bC.addBall(h,g,0,r);
+  bC.addBall(i,j,0,r); 
+  bC.addBall(i+f,g/3.0*2,0,r); 
+  bC.addBall(b*sin(PI/2.9)*1.05,b*cos(PI/2.9)*1.05,0,r); 
+  bC.addBall(x+f/2.0,f*sin(PI/3),0,r); 
+  bC.addBall(x,0,0,r); 
+ 
+ //8-13
+  bC.addBall(0,-b,0,r); 
+  bC.addBall(h,-g,0,r);
+  bC.addBall(i,-j,0,r);
+  bC.addBall(i+f,-g/3.0*2,0,r); 
+  //bC.addBall(b*sin(PI/3),-b/2.0,0,r); 
+  bC.addBall(b*sin(PI/2.9)*1.05,-b*cos(PI/2.9)*1.05,0,r); 
+  bC.addBall(x+f/2.0,-f*sin(PI/3),0,r); 
+//14-19
+  bC.addBall(-h,-g,0,r);
+  bC.addBall(-i,-j,0,r); 
+  bC.addBall(-(i+f),-g/3.0*2.0,0,r); 
+  //bC.addBall(-b*sin(PI/3),-b/2.0,0,r); 
+  bC.addBall(-b*sin(PI/2.9)*1.05,-b*cos(PI/2.9)*1.05,0,r); 
+  bC.addBall(-x-f/2.0,-f*sin(PI/3),0,r); 
+  bC.addBall(-x,0,0,r); 
+
+  
+  //20-24
+    bC.addBall(-h,g,0,r);
+    bC.addBall(-i,j,0,r); 
+    bC.addBall(-(i+f),g/3.0*2.0,0,r); 
+    //bC.addBall(-b*sin(PI/3),b/2.0,0,r); 
+    bC.addBall(-b*sin(PI/2.9)*1.05,b*cos(PI/2.9)*1.05,0,r); 
+    bC.addBall(-x-f/2.0,f*sin(PI/3),0,r); 
+
+  
+  // set ball color
+  for(int ii=0; ii<bC.numBalls(); ii++){bC.setBallColor(ii,bronze);}
+  
+  // add ball cloud
+  structure.addBallCloud(bC);
+  
+  structure.addIntraBeam(0,1);
+  structure.addIntraBeam(1,2);
+  structure.addIntraBeam(2,3);
+  structure.addIntraBeam(0,3);
+  structure.addIntraBeam(3,4);
+  structure.addIntraBeam(4,5);
+  structure.addIntraBeam(5,6);
+  structure.addIntraBeam(6,7);
+  structure.addIntraBeam(5,0);
+  structure.addIntraBeam(0,7);
+  
+  structure.addIntraBeam(0,8);
+  structure.addIntraBeam(0,10);
+  structure.addIntraBeam(0,12);
+  structure.addIntraBeam(8,9);
+  structure.addIntraBeam(9,10);
+  structure.addIntraBeam(10,11);
+  structure.addIntraBeam(11,12);
+  structure.addIntraBeam(13,12);
+  structure.addIntraBeam(13,7);
+
+
+  structure.addIntraBeam(0,19);
+  structure.addIntraBeam(0,17);
+  structure.addIntraBeam(0,15);
+  structure.addIntraBeam(18,19);
+  structure.addIntraBeam(18,17);
+  structure.addIntraBeam(17,16);
+  structure.addIntraBeam(15,16);
+  structure.addIntraBeam(15,14);
+  structure.addIntraBeam(14,8);
+  structure.addIntraBeam(0,21);
+  structure.addIntraBeam(0,23);
+  structure.addIntraBeam(20,21);
+  structure.addIntraBeam(21,22);
+  structure.addIntraBeam(22,23);
+  structure.addIntraBeam(23,24);
+  structure.addIntraBeam(24,19);
+  structure.addIntraBeam(1,20);
+  structure.addInterBeam(1,8,0,1,0);
+  structure.addInterBeam(5,17,1,0,0);
+  structure.addInterBeam(12,23,1,-1,0);
+  // set beam color
+  for(int ii=0; ii<structure.numBeamsInCloud(); ii++){structure.setBeamColor(ii,contrastingColors[gC++%21]);}
+  
+  // define transforms
+  cTransform s1 = new cTransform(), s2 = new cTransform(), s3 = new cTransform();
+  int n1=5, n2=5, n3=1;
+   //s1.rotate(PI/2, V(0,0,1.0));
+  s1.translate(2*b+f, g,0);
+  s2.translate(0,2*g,0);
+  
+
+  // applyTransform
+  structure.addTransforms(s1,s2,s3,n1,n2,n3);
+  
+  // return the structure
+  return structure;
+}
