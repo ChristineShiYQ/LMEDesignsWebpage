@@ -1,0 +1,157 @@
+import java.lang.reflect.*;
+
+class cParams
+{
+  float ringRad = 7.0;  
+  float ballRad = 5.0;  
+  int numCells = 5;  
+  int numRepeats = 9;
+  float scale = 0.79;
+  float reinforcementDepth = 50.0;
+  float quadric = 0.5;
+  float cloudSize = 50;
+  int widthn = 1;
+  int lengthn = 1;
+  int heighthn = 1;
+  float bend = 0;
+  int interbeams = 0;
+}
+cLattice latticeMaker(cParams params)
+{  
+  float r = params.ringRad;
+  float a = params.cloudSize;
+  float b = a*2;
+  
+
+  // create lattice object
+  cLattice structure = new cLattice();
+  
+  // design the ball cloud 
+  cBallCloud bC = new cBallCloud();
+  int n = 3; // number of balls in a cell  
+//0-3
+  bC.addBall(a,0,b,r); 
+  bC.addBall(0,a,b,r); 
+  bC.addBall(-a,0,b,r); 
+  bC.addBall(0,-a,b,r); 
+
+//4-7
+  bC.addBall(a,0,-b,r); 
+  bC.addBall(0,a,-b,r); 
+  bC.addBall(-a,0,-b,r); 
+  bC.addBall(0,-a,-b,r); 
+  
+//8-11  
+  bC.addBall(a,b,0,r); 
+  bC.addBall(0,b,a,r); 
+  bC.addBall(-a,b,0,r); 
+  bC.addBall(0,b,-a,r); 
+  
+//12-15  
+  bC.addBall(a,-b,0,r); 
+  bC.addBall(0,-b,a,r); 
+  bC.addBall(-a,-b,0,r); 
+  bC.addBall(0,-b,-a,r); 
+  
+//16-19  
+  bC.addBall(b,a,0,r); 
+  bC.addBall(b,0,a,r); 
+  bC.addBall(b,-a,0,r); 
+  bC.addBall(b,0,-a,r); 
+  
+//20-23
+  bC.addBall(-b,a,0,r); 
+  bC.addBall(-b,0,a,r); 
+  bC.addBall(-b,-a,0,r);   
+  bC.addBall(-b,0,-a,r); 
+
+  // set ball color
+  for(int i=0; i<bC.numBalls(); i++){bC.setBallColor(i,bronze);}
+  
+  // add ball cloud
+  structure.addBallCloud(bC);
+  
+//0-3
+  structure.addIntraBeam(1,0);
+  structure.addIntraBeam(2,1);
+  structure.addIntraBeam(2,3);
+  structure.addIntraBeam(3,0);
+  
+//4-7
+  structure.addIntraBeam(4,5);
+  structure.addIntraBeam(6,5);
+  structure.addIntraBeam(6,7);
+  structure.addIntraBeam(7,4);
+
+//8-11
+  structure.addIntraBeam(8,9);
+  structure.addIntraBeam(9,10);
+  structure.addIntraBeam(10,11);
+  structure.addIntraBeam(11,8);
+
+//12-15
+  structure.addIntraBeam(12,13);
+  structure.addIntraBeam(13,14);
+  structure.addIntraBeam(14,15);
+  structure.addIntraBeam(15,12);
+  
+//16-19
+  structure.addIntraBeam(16,17);
+  structure.addIntraBeam(17,18);
+  structure.addIntraBeam(18,19);
+  structure.addIntraBeam(19,16);
+
+//20-23
+  structure.addIntraBeam(20,21);
+  structure.addIntraBeam(21,22);
+  structure.addIntraBeam(22,23);
+  structure.addIntraBeam(23,20);
+  
+  structure.addIntraBeam(1,9);
+  structure.addIntraBeam(5,11);
+  structure.addIntraBeam(13,3);
+  structure.addIntraBeam(15,7);
+  structure.addIntraBeam(17,0);
+  structure.addIntraBeam(19,4);
+  structure.addIntraBeam(21,2);
+  structure.addIntraBeam(23,6);
+  structure.addIntraBeam(8,16);
+  structure.addIntraBeam(18,12);
+  structure.addIntraBeam(22,14);
+  structure.addIntraBeam(20,10);
+  if(params.interbeams != 0) {
+  structure.addInterBeam(3,7,0,0,1);
+  structure.addInterBeam(1,5,0,0,1);
+  structure.addInterBeam(0,4,0,0,1);
+  structure.addInterBeam(2,6,0,0,1);
+  structure.addInterBeam(18,22,1,0,0);
+  structure.addInterBeam(16,20,1,0,0);
+  structure.addInterBeam(17,21,1,0,0);
+  structure.addInterBeam(19,23,1,0,0);
+  structure.addInterBeam(9,13,0,1,0);
+  structure.addInterBeam(8,12,0,1,0);
+  structure.addInterBeam(11,15,0,1,0);
+  structure.addInterBeam(10,14,0,1,0);
+  }
+  // set beam color
+  for(int i=0; i<structure.numBeamsInCloud(); i++){structure.setBeamColor(i,contrastingColors[gC++%21]);}
+  
+  // define transforms
+  cTransform s1 = new cTransform(), s2 = new cTransform(), s3 = new cTransform();
+  int n1=params.lengthn, n2=params.widthn, n3=params.heighthn;
+  float c = 3*b;
+  s1.translate(c*1.5,0,0);
+  
+  float centery = n2*c/2.0;
+  float centerz = n3*c/2.0;
+  s2.translate(0,c,0);
+  
+  s3.translate(0,0,c);
+  s3.rotate(PI/6*params.bend, V(0,1,0), P(1500,0,0));
+  
+  // applyTransform
+  structure.addTransforms(s1,s2,s3,n1,n2,n3);
+  
+  // return the structure
+  return structure;
+}

@@ -1,0 +1,16 @@
+ringRad = 7// radius of tower's base - changes size of tower's base
+ballRad = 10// radius of balls in the base ring - make the balls bigger and the beams thicker
+numCells = 50 // number of hexagonal cells in a ring around the tower - controls lattice density
+numRepeats = 50//number of repeats - changes the length of the towerSS
+scale = 0.989// scale - changes tapering of tower and gradation of ball radius and beam thickness
+cloudSize = 50
+widthn = 4 //width of the brick
+lengthn =2
+heighthn = 10
+interbeams = 1 //0 for no inter beams. Any other numbers for inter beams.
+bend = 0.5 //percentage of bending. 0 for no bending. 1 for PI/6 of bending angle. 0.5 for PI/12 of bending angle.
+//reinforcementDepth = 100.0 // gap between inner honeycomb and reinforcement shell around it
+//quadric = 1 // vary between 0 to 1 to control thickness of quadric beam
+write
+show 
+//probe 300
