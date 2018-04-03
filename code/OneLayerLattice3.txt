@@ -1,0 +1,89 @@
+import java.lang.reflect.*;
+
+class cParams
+{
+  float ringRad = 200.0;  
+  float ballRad = 5.0;  
+  int numCells = 5;  
+  int numRepeats = 9;
+  float scale = 0.79;
+  float reinforcementDepth = 50.0;
+  float quadric = 0.5;
+}
+cLattice latticeMaker(cParams params)
+{  
+  float r = 10;
+  float a = 80*2;
+  float b = a/2.0*tan(PI/3);
+  float c = 2*b;
+  float d = c*tan(PI/3.0)/3.0;
+  float x = a/4.0;
+  float y = x*tan(PI/3.0);
+  float z = 30*2;
+  float midPtH1 = tan(PI/6.0)*a/3+b;
+  float midPtH2 = tan(PI/6.0)*2*a/3+b;
+  // create lattice object
+  cLattice structure = new cLattice();
+  
+  // design the ball cloud 
+  cBallCloud bC = new cBallCloud();
+  int n = 3; // number of balls in a cell  
+
+  // add balls
+  bC.addBall(-a/2,b,0,r); 
+  bC.addBall(a/2,b,0,r); 
+  bC.addBall(a,0,0,r);
+  bC.addBall(a/2,-b,0,r); 
+  bC.addBall(-a/2,-b,0,r); 
+  bC.addBall(-a,0,0,r);
+ 
+  bC.addBall(x,y,0,r); 
+  bC.addBall(a/2.0,0,0,r); 
+  bC.addBall(x,-y,0,r); 
+  bC.addBall(-x,-y,0,r); 
+  bC.addBall(-a/2.0,0,0,r); 
+  bC.addBall(-x,y,0,r); 
+
+  // set ball color
+  for(int i=0; i<bC.numBalls(); i++){bC.setBallColor(i,bronze);}
+  
+  // add ball cloud
+  structure.addBallCloud(bC);
+  
+  // add intra beams
+  structure.addIntraBeam(0,1);
+  structure.addIntraBeam(1,2);
+  structure.addIntraBeam(2,3);
+  structure.addIntraBeam(3,4);
+  structure.addIntraBeam(4,5);
+  structure.addIntraBeam(5,0);
+  
+  structure.addInterBeam(6,10,0,1,0);
+  structure.addInterBeam(7,9,0,1,0);
+  structure.addInterBeam(6,8,1,0,0);
+  structure.addInterBeam(11,9,1,0,0);
+  structure.addInterBeam(8,10,-1,1,0);
+  structure.addInterBeam(7,11,-1,1,0);
+  
+  //structure.addInterBeam(2,0,1,0,0);
+  //structure.addInterBeam(3,0,1,0,0);
+  //structure.addInterBeam(3,1,1,0,0);
+  
+  // set beam color
+  for(int i=0; i<structure.numBeamsInCloud(); i++){structure.setBeamColor(i,contrastingColors[gC++]);}
+  
+  // define transforms
+  cTransform s1 = new cTransform(), s2 = new cTransform(), s3 = new cTransform();
+  int n1=6, n2=6, n3=1;
+  
+  s1.translate(0, b*3,0);
+  
+  
+  s2.translate(b*1.5*tan(PI/3),b*1.5,0);
+  
+  // applyTransform
+  structure.addTransforms(s1,s2,s3,n1,n2,n3);
+  
+  // return the structure
+  return structure;
+}

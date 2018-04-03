@@ -7,7 +7,7 @@ class cParams
   int numCells = 5;  
   int numRepeats = 9;
   float scale = 0.79;
-  float reinforcementDepth = 50.0; // 0.5*sqrt(3.0)*ringRad*2.0*PI/(3.0*numCells);
+  float reinforcementDepth = 50.0;
   float quadric = 0.5;
 }
 cLattice latticeMaker(cParams params)
@@ -24,72 +24,42 @@ cLattice latticeMaker(cParams params)
   // design the ball cloud 
   cBallCloud bC = new cBallCloud();
   int n = 3; // number of balls in a cell  
-//0-3
+  //0-3
   bC.addBall(a,0,b,r); 
   bC.addBall(0,a,b,r); 
   bC.addBall(-a,0,b,r); 
   bC.addBall(0,-a,b,r); 
 
-//4-7
+  //4-7
   bC.addBall(a,0,-b,r); 
   bC.addBall(0,a,-b,r); 
   bC.addBall(-a,0,-b,r); 
   bC.addBall(0,-a,-b,r); 
   
-//8-11  
+  //8-11  
   bC.addBall(a,b,0,r); 
   bC.addBall(0,b,a,r); 
   bC.addBall(-a,b,0,r); 
   bC.addBall(0,b,-a,r); 
   
-//12-15  
+  //12-15  
   bC.addBall(a,-b,0,r); 
   bC.addBall(0,-b,a,r); 
   bC.addBall(-a,-b,0,r); 
   bC.addBall(0,-b,-a,r); 
   
-//16-19  
+  //16-19  
   bC.addBall(b,a,0,r); 
   bC.addBall(b,0,a,r); 
   bC.addBall(b,-a,0,r); 
   bC.addBall(b,0,-a,r); 
   
-//20-23
+  //20-23
   bC.addBall(-b,a,0,r); 
   bC.addBall(-b,0,a,r); 
   bC.addBall(-b,-a,0,r); 
   bC.addBall(-b,0,-a,r); 
   
-  //bC.addBall(a,b,0,r);
-  //bC.addBall(a,-b,0,r); 
-  //bC.addBall(-a,b,0,r); 
-  //bC.addBall(-a,-b,0,r);
-  
-  
-  //bC.addBall(a,0,b,r); 
-  //bC.addBall(a,0,-b,r); 
-  //bC.addBall(-a,0,b,r); 
-  //bC.addBall(-a,0,-b,r); 
-
-  //bC.addBall(b,0,a,r); 
-  //bC.addBall(b,0,-a,r); 
-  //bC.addBall(-b,0,a,r); 
-  //bC.addBall(-b,0,-a,r); 
-  
-  // bC.addBall(b,a,0,r); 
-  //bC.addBall(b,-a,0,r); 
-  //bC.addBall(-b,a,0,r); 
-  //bC.addBall(-b,-a,0,r); 
-  
-  //bC.addBall(0,b,a,r); 
-  //bC.addBall(0,-b,a,r); 
-  //bC.addBall(0,b,-a,r); 
-  //bC.addBall(0,-b,-a,r); 
-  
-  //bC.addBall(0,a,b,r); 
-  //bC.addBall(0,a,-b,r); 
-  //bC.addBall(0,-a,b,r); 
-  //bC.addBall(0,-a,-b,r); 
   // set ball color
   for(int i=0; i<bC.numBalls(); i++){bC.setBallColor(i,bronze);}
   
@@ -155,24 +125,14 @@ for(int i=0; i<bC.numBalls(); i++){structure.addInterBeam(i,i,0,0,1);}
   int n1=1, n2=1, n3=1;
   
   s1.translate(2*a,0,0);
-  //s1.scale(.79);
   s1.rotate(PI/50, V(0,0,1.0));
   
-  
   s2.translate(0,b,0);
-  //s1.scale(.79);
-  //s2.rotate(PI/2, V(0,0,1.0));
-  
-  
+   
   //s3.translate(0,0,y*2);
   s3.scale(1.02);
   //s3.rotate(0.2*alpha, V(1,1,1));
-  
-  //looped directions
-  //structure.closeDirection1();
-  //structure.closeDirection2();
-  //structure.closeDirection3();
-  
+    
   // applyTransform
   structure.addTransforms(s1,s2,s3,n1,n2,n3);
   

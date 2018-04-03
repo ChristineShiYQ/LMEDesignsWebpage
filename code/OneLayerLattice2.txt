@@ -7,7 +7,7 @@ class cParams
   int numCells = 5;  
   int numRepeats = 9;
   float scale = 0.79;
-  float reinforcementDepth = 50.0; // 0.5*sqrt(3.0)*ringRad*2.0*PI/(3.0*numCells);
+  float reinforcementDepth = 50.0;
   float quadric = 0.5;
 }
 cLattice latticeMaker(cParams params)
@@ -29,7 +29,8 @@ cLattice latticeMaker(cParams params)
   // design the ball cloud 
   cBallCloud bC = new cBallCloud();
   int n = 3; // number of balls in a cell  
-//0-5
+
+  //0-5
   bC.addBall(0,y,0,r);
   bC.addBall(x,yy,0,r);
   bC.addBall(x,-yy,0,r);
@@ -89,6 +90,7 @@ cLattice latticeMaker(cParams params)
   // add ball cloud
   structure.addBallCloud(bC);
 
+  //add intra beams
   structure.addIntraBeam(0,1);
   structure.addIntraBeam(1,2);
   structure.addIntraBeam(2,3);
