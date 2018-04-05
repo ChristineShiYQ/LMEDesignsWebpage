@@ -1,0 +1,58 @@
+import java.lang.reflect.*;
+
+class cParams
+{
+  float ringRad = 20.0;  
+  float ballRad = 3.0;
+  int numRepeats1 = 3; 
+  int numRepeats2 = 4; 
+  int numRepeats3 = 5; 
+}
+cLattice latticeMaker(cParams params)
+{  
+  float r = 25.0;
+  
+  // create brick lattice
+  cLattice structure = new cLattice();
+  
+  // design the ball cloud 
+  cBallCloud bC = new cBallCloud();
+  bC.addBall(100,100,0, r);
+  
+  bC.mTransform.translate(100,0,0);
+  bC.mTransform.rotate(PI*0.25, V(1,0,0));
+      
+  // set ball color
+  for(int i=0; i<bC.mBalls.size(); i++){bC.setBallColor(i,randomColor());}
+  
+  // add ball cloud
+  structure.addBallCloud(bC);
+  
+  // define beams
+  structure.addInterBeam(0,0,1,0,0); // xBeam
+  structure.addInterBeam(0,0,0,1,0); // yBeam
+  structure.addInterBeam(0,0,0,0,1); // zBeam
+
+  // define beam colors
+  for(int i=0; i<structure.numBeamsInCloud(); i++){structure.setBeamColor(i,contrastingColors[gC++]);}
+    
+  // define a transform for pattern
+  cTransform s1 = new cTransform(), s2 = new cTransform(), s3 = new cTransform();
+  int n1=10, n2=20, n3=10;
+  s1.translate(4.*r,0,0);
+  s2.rotate(2.0*PI/(float)n2, V(0,0,1.0));
+  s3.translate(0,0,32.*r);
+  s3.scale(0.79);
+  s3.rotate(0.5*PI/(float)n3, V(1,1,1));
+  
+  // closeDirection
+  //structure.closeDirection1();
+  structure.closeDirection2();
+  //structure.closeDirection3();
+  
+  // applyTransform
+  structure.addTransforms(s1,s2,s3,n1,n2,n3);
+  
+  // return the tower object
+  return structure;
+}
