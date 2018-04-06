@@ -1,0 +1,124 @@
+import java.lang.reflect.*;
+
+class cParams
+{
+  float ringRad = 200.0;  
+  float ballRad = 5.0;  
+  int numCells = 5;  
+  int numRepeats = 9;
+  float scale = 0.79;
+  float reinforcementDepth = 50.0; // 0.5*sqrt(3.0)*ringRad*2.0*PI/(3.0*numCells);
+}
+cLattice latticeMaker(cParams params)
+{  
+  float r = 25;
+  float l = 16.0*r; // hex side
+  
+  float h = l;
+  float s = 1.0;
+  
+  
+  float x = l*cos(PI/6); // hex x
+  float y = l*sin(PI/6); // hex y
+  
+  // create lattice object
+  cLattice structure = new cLattice();
+  
+  // design the ball cloud - design first ring  
+  cBallCloud bC = new cBallCloud();
+
+  //    3***4***0  
+  //  *  *     *  
+  // 5    2***1
+  // create ball cloud
+  bC.addBall(x,-(l*0.5+y),0,r); 
+  bC.addBall(0,-l*0.5,0,r);
+  bC.addBall(0,l*0.5,0,r);
+  bC.addBall(x,l*0.5+y,0,r); 
+  
+  bC.addBall(x,0,h,r);
+  bC.addBall(0,l+y,h,r);
+  
+  // set ball color
+  for(int i=0; i<bC.mBalls.size(); i++){bC.setBallColor(i,bronze);}
+  
+  // add ball cloud
+  structure.addBallCloud(bC);
+  
+  // define hexmesh
+  for(int i=0; i<3; i++) structure.addIntraBeam(i,i+1); // half hexagon boundary
+  structure.addInterBeam(0,1,1,0,0); // connect half hexagons along x
+  structure.addInterBeam(3,2,1,0,0); // connect half hexagons along x
+  structure.addInterBeam(3,0,0,1,0); // connect half hexagons along y
+  
+  for(int i=0; i<4; i++) structure.addIntraBeam(4,i);
+  structure.addInterBeam(4,1,1,0,0);
+  structure.addInterBeam(4,2,1,0,0); 
+  
+  structure.addIntraBeam(5,2); 
+  structure.addIntraBeam(5,3); 
+  structure.addInterBeam(5,0,0,1,0);
+  structure.addInterBeam(5,1,0,1,0); 
+  structure.addInterBeam(5,3,-1,0,0);
+  structure.addInterBeam(5,0,-1,1,0);
+    
+  // define trimesh  
+  structure.addIntraBeam(4,5); 
+  structure.addInterBeam(4,4,1,0,0);
+  structure.addInterBeam(4,5,1,0,0);
+  structure.addInterBeam(4,5,1,-1,0);
+  structure.addInterBeam(4,5,0,-1,0);
+  
+  structure.addInterBeam(5,5,1,0,0);
+  
+  // connect hexmesh to trimesh along height
+  for(int i=0; i<4; i++) structure.addInterBeam(4,i,0,0,1);
+  structure.addInterBeam(4,1,1,0,1);
+  structure.addInterBeam(4,2,1,0,1); 
+  
+  
+  structure.addInterBeam(5,2,0,0,1); 
+  structure.addInterBeam(5,3,0,0,1); 
+  structure.addInterBeam(5,0,0,1,1);
+  structure.addInterBeam(5,1,0,1,1); 
+  structure.addInterBeam(5,3,-1,0,1);
+  structure.addInterBeam(5,0,-1,1,1); 
+  
+  // connect hexmesh to hexmesh
+  for(int i=0; i<4; i++) structure.addInterBeam(i,i,0,0,1);
+  
+  // connect trimesh to trimesh
+  structure.addInterBeam(4,4,0,0,1); 
+  structure.addInterBeam(5,5,0,0,1);
+  
+
+  // set beam color
+  for(int i=0; i<structure.numBeamsInCloud(); i++){structure.setBeamColor(i,contrastingColors[gC%contrastingColors.length]); gC++;}
+  
+  // define transforms
+  cTransform s1 = new cTransform(), s2 = new cTransform(), s3 = new cTransform();
+  int n1=10, n2=5, n3=2;
+  
+  s1.translate(2.0*x,0,0);
+  //s1.scale(1.21);
+  //s1.rotate(2.0*PI/(float)n1, V(0,0,1.0));
+  
+  s2.translate(0,2.0*y+2.0*l,0);
+  //s2.scale(0.79);
+  //s2.rotate(np*alpha, V(0,0,1.0)); 
+  
+  s3.translate(0,0,2.0*h);
+  //s3.scale(scale);
+  //s3.rotate(0.2*alpha, V(1,1,1));
+  
+  //looped directions
+  //structure.closeDirection1();
+  //structure.closeDirection2();
+  //structure.closeDirection3();
+  
+  // applyTransform
+  structure.addTransforms(s1,s2,s3,n1,n2,n3);
+  
+  // return structure
+  return structure;
+}

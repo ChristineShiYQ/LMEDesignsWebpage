@@ -1,0 +1,68 @@
+import java.lang.reflect.*;
+
+class cParams
+{
+  float ringRad = 200.0;  
+  float ballRad = 5.0;  
+  int numCells = 5;  
+  int numRepeats = 9;
+  float scale = 0.79;
+  float reinforcementDepth = 50.0;
+  float quadric = 0.5;
+}
+cLattice latticeMaker(cParams params)
+{  
+  float r = 10;
+  float l = 100; // hex side
+  float x = l*cos(PI/6); // hex x
+  float y = l*sin(PI/6); // hex y
+   
+  // create lattice object
+  cLattice structure = new cLattice();
+  
+  // design the ball cloud 
+  cBallCloud bC = new cBallCloud();
+  int n = 4; // number of balls in a cell  
+  
+  bC.addBall(0,-l,0,r); 
+  bC.addBall(-x,-y,0,r);
+  bC.addBall(-x,y,0,r);
+  bC.addBall(0,l,0,r);      
+  
+  // set ball color
+  for(int i=0; i<bC.numBalls(); i++){bC.setBallColor(i,bronze);}
+  
+  // add ball cloud
+  structure.addBallCloud(bC);
+  
+  // define intra-beams
+  for(int i=0; i<3; i++) structure.addIntraBeam(i,i+1); // half hexagon
+  
+  // define inter-beams
+  structure.addInterBeam(0,1,1,0,0); // connect half hexagon along x
+  structure.addInterBeam(3,2,1,0,0); // connect half hexagon along x
+  
+  structure.addInterBeam(3,0,0,1,0); // connect half hexagon along y
+  
+  for(int i=0; i<4; i++)
+  {
+    structure.addInterBeam(i,i,0,0,1); // connect half hexagon along z
+  }
+  
+  // set beam color
+  for(int i=0; i<structure.numBeamsInCloud(); i++){structure.setBeamColor(i,contrastingColors[gC++]);}
+  
+  // define transforms
+  cTransform s1 = new cTransform(), s2 = new cTransform(), s3 = new cTransform();
+  int n1=20, n2=5, n3=5;
+  
+  s1.translate(2.0*x,0,0);  
+  s2.translate(0,3.0*l,0);
+  s3.translate(0,0,l);
+  
+  // applyTransform
+  structure.addTransforms(s1,s2,s3,n1,n2,n3);
+  
+  // return the structure
+  return structure;
+}
