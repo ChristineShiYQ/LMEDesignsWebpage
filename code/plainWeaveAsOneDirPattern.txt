@@ -1,0 +1,93 @@
+import java.lang.reflect.*;
+
+class cParams
+{
+  float hexSize = 25; 
+  int numHexCells = 9;
+  float ballRad = hexSize*0.5*cos(PI/6); 
+  int numRepeats = 9;
+  
+}
+cLattice latticeMaker(cParams params)
+{  
+  int n = params.numRepeats;
+  int nc = params.numHexCells;
+  float r = params.ballRad;
+  float h = params.hexSize;
+  
+  // create weave object
+  cLattice weave = new cLattice();
+  
+  // design the ball cloud
+  cBallCloud c1 = new cBallCloud();
+  int nbc = 16; // number of balls in a cell  
+  
+  // create ball cloud for the cell
+  c1.addBall(-(h*sin(PI/6.)+0.5*h),0,0,r); 
+  c1.addBall(-0.5*h,0,h*cos(PI/6.),r);
+  c1.addBall(0.5*h,0,h*cos(PI/6.),r);
+  c1.addBall((h*sin(PI/6.)+0.5*h),0,0,r);
+  
+  c1.addBall(-(h*sin(PI/6.)+0.5*h),  h*sin(PI/6.)+h,  h*cos(PI/6.),r); 
+  c1.addBall(-0.5*h,                 h*sin(PI/6.)+h,  0,r);
+  c1.addBall(0.5*h,                  h*sin(PI/6.)+h,  0,r);
+  c1.addBall((h*sin(PI/6.)+0.5*h),   h*sin(PI/6.)+h,  h*cos(PI/6.),r);
+  
+  c1.addBall(0, -(h*sin(PI/6.)+0.5*h),h*cos(PI/6.),r); 
+  c1.addBall(0, -0.5*h, 0, r);
+  c1.addBall(0, 0.5*h, 0, r);
+  c1.addBall(0, (h*sin(PI/6.)+0.5*h), h*cos(PI/6.), r); 
+  
+  c1.addBall(0.5*h+h*cos(PI/6.), -(h*sin(PI/6.)+0.5*h),0,r); 
+  c1.addBall(0.5*h+h*cos(PI/6.), -0.5*h, h*cos(PI/6.), r);
+  c1.addBall(0.5*h+h*cos(PI/6.), 0.5*h, h*cos(PI/6.), r);
+  c1.addBall(0.5*h+h*cos(PI/6.), (h*sin(PI/6.)+0.5*h), 0, r); 
+   
+  cTransform t2 = new cTransform();
+  t2.translate(2.*h*sin(PI/6.)+2.*h,0,0);
+  
+  // define c2
+  cBallCloud c2 =  new cBallCloud();
+  cBallCloud ci = c1;
+  for(int i=0; i<nc; i++)
+  {
+    c2.addBalls(c1);
+    c1 = transform(c1,t2);   
+  }
+  
+  // set ball color
+  for(int i=0; i<nc; i++){for(int j=0; j<nbc; j++) {if(j<8)c2.setBallColor(i*nbc+j,red); else c2.setBallColor(i*nbc+j,blue);}}
+  
+  // add ball cloud
+  weave.addBallCloud(c2);
+  
+  // define intra-beams
+  for(int i=0; i<nc; i++)
+  {
+    for(int j=0; j<3; j++) {weave.addIntraBeam(i*nbc+j,i*nbc+j+1);} // red half hexagon boundary
+    for(int j=4; j<7; j++) {weave.addIntraBeam(i*nbc+j,i*nbc+j+1);} // red half hexagon boundary
+    
+    for(int j=8; j<11; j++) {weave.addIntraBeam(i*nbc+j,i*nbc+j+1);} // transverse blue half hexagon boundary
+    for(int j=12; j<15; j++) {weave.addIntraBeam(i*nbc+j,i*nbc+j+1);} // transverse blue half hexagon boundary
+    
+    if(i<nc-1)weave.addIntraBeam(i*nbc+3,(i+1)*nbc); // connect half hexagons
+    if(i<nc-1)weave.addIntraBeam(i*nbc+7,(i+1)*nbc+4); // connect half hexagons
+  }
+  
+  // define inter-beams
+  for(int i=0; i<nc; i++)
+  {
+    weave.addInterBeam(i*nbc+11,i*nbc+8,1,0,0); // connect transverse half hexagons
+    weave.addInterBeam(i*nbc+15,i*nbc+12,1,0,0); // connect transverse half hexagons
+  }
+  
+  // define a transform for pattern
+  cTransform patternTransform = new cTransform();
+  patternTransform.translate(0,2.*h*sin(PI/6.)+2.*h,0);
+  
+  // applyTransform
+  weave.addTransforms(patternTransform,new cTransform(),new cTransform(), params.numRepeats, 1, 1);
+  
+  // return the tower object
+  return weave;
+}

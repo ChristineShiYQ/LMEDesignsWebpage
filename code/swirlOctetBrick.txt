@@ -1,0 +1,101 @@
+import java.lang.reflect.*;
+
+class cParams
+{
+  float ringRad = 200.0;  
+  float ballRad = 5.0;  
+  int numCells = 5;  
+  int numRepeats = 9;
+  float scale = 0.79;
+  float reinforcementDepth = 50.0; // 0.5*sqrt(3.0)*ringRad*2.0*PI/(3.0*numCells);
+  float quadric = 0.5;
+}
+cLattice latticeMaker(cParams params)
+{  
+  float r = params.ballRad;
+  float s = params.scale;
+  float h = 32.0*r; // cube size
+  
+  // create lattice object
+  cLattice structure = new cLattice();
+  
+  // design the ball cloud 
+  cBallCloud bC = new cBallCloud();
+  bC.addBall(0,0,0,r); 
+  bC.addBall(0.5*h,0.5*h,0,r); 
+  bC.addBall(0,0.5*h,0.5*h,r); 
+  bC.addBall(0.5*h,0,0.5*h,r); 
+      
+  // set ball color
+  for(int i=0; i<bC.mBalls.size(); i++){bC.setBallColor(i,bronze);}
+  
+  // add ball cloud
+  structure.addBallCloud(bC);
+  
+  // define beams
+  
+  // 1. intra tet
+  structure.addIntraBeam(0,1); // xyBeam
+  structure.addIntraBeam(0,2); // yzBeam
+  structure.addIntraBeam(0,3); // zxBeam
+  
+  structure.addIntraBeam(1,2); // xy-yzBeam
+  structure.addIntraBeam(2,3); // yz-zxBeam
+  structure.addIntraBeam(3,1); // zx-xyBeam
+  
+  // 2. x tet
+  structure.addInterBeam(1,0,1,0,0);
+  structure.addInterBeam(3,0,1,0,0);
+  structure.addInterBeam(1,2,1,0,0);
+  structure.addInterBeam(3,2,1,0,0);
+ 
+  // 3. y tet
+  structure.addInterBeam(1,0,0,1,0);
+  structure.addInterBeam(2,0,0,1,0);
+  structure.addInterBeam(1,3,0,1,0);
+  structure.addInterBeam(2,3,0,1,0);
+  
+  // 4. z tet
+  structure.addInterBeam(2,0,0,0,1);
+  structure.addInterBeam(3,0,0,0,1);
+  structure.addInterBeam(2,1,0,0,1);
+  structure.addInterBeam(3,1,0,0,1);
+  
+  // 5. xy tet
+  structure.addInterBeam(1,0,1,1,0);
+  structure.addInterBeam(2,3,-1,1,0);
+  
+  // 6. yz tet
+  structure.addInterBeam(2,0,0,1,1);
+  structure.addInterBeam(3,1,0,-1,1);
+  
+  // 7. zx tet
+  structure.addInterBeam(2,1,-1,0,1);
+  structure.addInterBeam(3,0,1,0,1);
+
+
+  // set beam color
+  for(int i=0; i<structure.numBeamsInCloud(); i++){structure.setBeamColor(i,contrastingColors[gC%contrastingColors.length]); gC++;}
+  
+  // define transforms
+  cTransform s1 = new cTransform(), s2 = new cTransform(), s3 = new cTransform();
+  int n1 = 10, n2=10, n3=50;
+  
+  s1.translate(h,0,0);
+  //s1.scale(s);
+  //s1.rotate(2.0*PI/(float)n1, V(1.0,0,0));
+  
+  s2.translate(0,h,0); 
+  //s2.scale(s); 
+  //s2.rotate(2.0*PI/(float)n2, V(0,1.0,0));
+  
+  s3.translate(0,0,h);
+  s3.scale(0.97,P(h*n1/2,h*n2/2,0));
+  s3.rotate(PI/50.0, V(0,0,1.0));
+
+  // apply transform
+  structure.addTransforms(s1,s2,s3,n1,n2,n3);
+  
+  // return structure
+  return structure;
+}
